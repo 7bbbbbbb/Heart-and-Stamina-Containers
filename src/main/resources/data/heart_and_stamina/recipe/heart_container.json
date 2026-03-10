@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "X": {
+      "item": "heart_and_stamina:heart_container_shard"
+    },
+    "Y": {
+      "item": "minecraft:gold_ingot"
+    }
+  },
+  "pattern": [
+    "XYX",
+    "XXX",
+    "YXY"
+  ],
+  "result": {
+    "count": 1,
+    "id": "heart_and_stamina:heart_container"
+  }
+}

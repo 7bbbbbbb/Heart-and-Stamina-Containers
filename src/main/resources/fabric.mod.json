@@ -1,0 +1,36 @@
+{
+	"schemaVersion": 1,
+	"id": "heart_and_stamina",
+	"version": "${version}",
+	"name": "Heart and Stamina Containers",
+	"description": "A mod that adds exploration-based Heart and Stamina item upgrades.",
+	"authors": [
+		"x7bbbbbbb"
+	],
+	"contact": {
+		"homepage": "https://ko-fi.com/x7bbbbbbb#",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "MIT",
+	"icon": "assets/heart_and_stamina/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+          "net.x7bbbbbbb.heart_and_stamina.HeartAndStamina"
+		],
+        "client": [
+          "net.x7bbbbbbb.heart_and_stamina.HeartAndStaminaClient"
+        ]
+	},
+	"mixins": [],
+	"depends": {
+		"fabricloader": ">=0.18.4",
+		"minecraft": "~1.21.1",
+		"java": ">=21",
+		"fabric-api": "*",
+        "owo": "0.12.15.4+1.21"
+	},
+    "suggests": {
+      "staminafortweakers": "*"
+    }
+}

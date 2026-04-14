@@ -19,7 +19,7 @@ public class HeartItems {
     }
 
     public static void registerModItems(){
-        HeartAndStamina.LOGGER.info("Registering Heart items for: " + HeartAndStamina.MOD_ID);
+        HeartAndStamina.LOGGER.info("Registering Heart items.");
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FOOD_AND_DRINK).register(entries -> {
             entries.add(HEART_CONTAINER);

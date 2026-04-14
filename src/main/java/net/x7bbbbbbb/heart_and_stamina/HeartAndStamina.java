@@ -6,6 +6,7 @@ import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
 import net.fabricmc.fabric.api.loot.v3.LootTableEvents;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
@@ -16,15 +17,16 @@ import net.minecraft.loot.function.SetCountLootFunction;
 import net.minecraft.loot.provider.number.ConstantLootNumberProvider;
 import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.registry.Registries;
+import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.x7bbbbbbb.heart_and_stamina.config.HeartAndStaminaConfig;
 import net.x7bbbbbbb.heart_and_stamina.item.HeartItems;
 import net.x7bbbbbbb.heart_and_stamina.item.StaminaItems;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 public class HeartAndStamina implements ModInitializer {
     public static final String MOD_ID = "heart_and_stamina";
@@ -36,6 +38,11 @@ public class HeartAndStamina implements ModInitializer {
 
     public static Identifier AVAILABLE_MAX_STAMINA_ID = null;
 
+    /** Entity ID's */
+    public static final Set<Identifier> EXACT_MOBS = new HashSet<>();
+    public static final List<Pattern> REGEX_MOBS = new ArrayList<>();
+    public static final Set<TagKey<EntityType<?>>> TAG_MOBS = new HashSet<>();
+
     @Override
     public void onInitialize() {
         HeartItems.registerModItems();
@@ -44,17 +51,63 @@ public class HeartAndStamina implements ModInitializer {
             AVAILABLE_MAX_STAMINA_ID = Identifier.of("staminafortweakers", "generic.max_stamina");
         }
 
-        Set<Identifier> targetLootTables = new HashSet<>();
-        for (String mobStr : CONFIG.mobsDropContainers()) {
-            Identifier mobId = Identifier.tryParse(mobStr);
-
-            if (mobId != null) {
-                Identifier lootTableId = Identifier.of(mobId.getNamespace(), "entities/" + mobId.getPath());
-                targetLootTables.add(lootTableId);
+        // Adding items to loot tables
+        for (String entry : CONFIG.mobsDropContainers()) {
+            if (entry.startsWith("#")) {
+                // It's a Tag
+                Identifier id = Identifier.tryParse(entry.substring(1));
+                if (id != null) TAG_MOBS.add(TagKey.of(Registries.ENTITY_TYPE.getKey(), id));
+            } else if (entry.contains("*") || entry.contains("[") || entry.contains("(")) {
+                // It's likely a Regex
+                try {
+                    REGEX_MOBS.add(Pattern.compile(entry));
+                } catch (PatternSyntaxException e) {
+                    System.err.println("Invalid Regex in X7B Config: " + entry);
+                }
             } else {
-                System.err.println("[Heart and Stamina] Invalid mob identifier in config: '" + mobStr + "'. Skipping!");
+                // It's a standard ID
+                Identifier id = Identifier.tryParse(entry);
+                if (id != null) EXACT_MOBS.add(id);
             }
         }
+
+        LootTableEvents.MODIFY.register((key, tableBuilder, source, registries) -> {
+            Identifier tableId = key.getValue();
+            if (!tableId.getPath().startsWith("entities/")) return;
+
+            String rawMobPath = tableId.getPath().replaceFirst("entities/", "");
+            Identifier mobId = Identifier.of(tableId.getNamespace(), rawMobPath);
+
+            boolean matches = EXACT_MOBS.contains(mobId);
+
+            if (!matches) {
+                String fullIdString = mobId.toString();
+                matches = REGEX_MOBS.stream().anyMatch(p -> p.matcher(fullIdString).matches());
+            }
+
+            if (!matches) {
+                var entityEntry = Registries.ENTITY_TYPE.getEntry(mobId);
+
+                if (entityEntry.isPresent()) {
+                    matches = TAG_MOBS.stream().anyMatch(tag -> entityEntry.get().isIn(tag));
+                }
+            }
+
+            if (matches) {
+                if (AVAILABLE_MAX_STAMINA_ID != null) {
+                    tableBuilder.pool(LootPool.builder()
+                            .rolls(ConstantLootNumberProvider.create(1))
+                            .conditionally(RandomChanceLootCondition.builder(1))
+                            .with(ItemEntry.builder(HeartItems.HEART_CONTAINER))
+                            .with(ItemEntry.builder(StaminaItems.STAMINA_CONTAINER)));
+                } else {
+                    tableBuilder.pool(LootPool.builder()
+                            .rolls(ConstantLootNumberProvider.create(1))
+                            .conditionally(RandomChanceLootCondition.builder(1))
+                            .with(ItemEntry.builder(HeartItems.HEART_CONTAINER)));
+                }
+            }
+        });
 
         if (AVAILABLE_MAX_STAMINA_ID != null) {
             LootTableEvents.MODIFY.register((key1, tableBuilder1, source1, registries1) -> {
@@ -80,16 +133,6 @@ public class HeartAndStamina implements ModInitializer {
                     }
                 }
             });
-            LootTableEvents.MODIFY.register((key2, tableBuilder2, source2, registries2) -> {
-                if (targetLootTables.contains(key2.getValue())) {
-                    LootPool.Builder poolBuilder = LootPool.builder()
-                            .rolls(ConstantLootNumberProvider.create(1))
-                            .conditionally(RandomChanceLootCondition.builder(1))
-                            .with(ItemEntry.builder(HeartItems.HEART_CONTAINER))
-                            .with(ItemEntry.builder(StaminaItems.STAMINA_CONTAINER));
-                    tableBuilder2.pool(poolBuilder);
-                }
-            });
         } else {
             LootTableEvents.MODIFY.register((key1, tableBuilder1, source1, registries1) -> {
                 Identifier id = key1.getValue();
@@ -110,15 +153,6 @@ public class HeartAndStamina implements ModInitializer {
                                 .with(ItemEntry.builder(HeartItems.HEART_CONTAINER_SHARD));
                         tableBuilder1.pool(poolBuilder);
                     }
-                }
-            });
-            LootTableEvents.MODIFY.register((key2, tableBuilder2, source2, registries2) -> {
-                if (targetLootTables.contains(key2.getValue())) {
-                    LootPool.Builder poolBuilder = LootPool.builder()
-                            .rolls(ConstantLootNumberProvider.create(1))
-                            .conditionally(RandomChanceLootCondition.builder(1))
-                            .with(ItemEntry.builder(HeartItems.HEART_CONTAINER));
-                    tableBuilder2.pool(poolBuilder);
                 }
             });
         }

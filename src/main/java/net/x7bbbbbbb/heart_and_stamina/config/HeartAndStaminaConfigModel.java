@@ -45,13 +45,10 @@ public class HeartAndStaminaConfigModel{
     public boolean showStaminaValueHUD = true;
     @Nest
     public HUDConfig nestedHUDConfig = new HUDConfig();
-    public float lootChance = 0.4f;
+    public float lootChance = 0.3f;
     public boolean luckIncreasesLoot = true;
     public List<String> mobsDropContainers = Arrays.asList(
-            "minecraft:elder_guardian",
-            "minecraft:ender_dragon",
-            "minecraft:warden",
-            "minecraft:wither"
+            "#c:bosses"
     );
 
     public static class HUDConfig {

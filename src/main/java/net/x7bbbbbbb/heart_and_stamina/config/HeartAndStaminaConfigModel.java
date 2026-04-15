@@ -48,7 +48,10 @@ public class HeartAndStaminaConfigModel{
     public float lootChance = 0.3f;
     public boolean luckIncreasesLoot = true;
     public List<String> mobsDropContainers = Arrays.asList(
-            "#c:bosses"
+            "minecraft:ender_dragon",
+            "minecraft:wither",
+            "minecraft:warden",
+            "minecraft:elder_guardian"
     );
 
     public static class HUDConfig {

@@ -31,6 +31,5 @@
   "text.config.heart_and_stamina_config.option.maxStamina.tooltip": "Value won't affect stamina modifiers from other sources.",
   "text.config.heart_and_stamina_config.option.showStaminaValueHUD.tooltip": "Used when a supported Stamina mod is installed.",
   "text.config.heart_and_stamina_config.option.lootChance": "Chest loot chance",
-  "text.config.heart_and_stamina_config.option.luckIncreasesLoot": "Luck increases chest loot",
-  "text.config.heart_and_stamina_config.option.mobsDropContainers": "List of mobs that drop containers"
+  "text.config.heart_and_stamina_config.option.luckIncreasesLoot": "Luck increases chest loot"
 }

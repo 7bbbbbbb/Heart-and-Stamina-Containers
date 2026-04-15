@@ -19,7 +19,7 @@ public class StaminaItems {
     }
 
     public static void registerModItems(){
-        HeartAndStamina.LOGGER.info("Stamina Mod found. Registering Stamina items.");
+        HeartAndStamina.LOGGER.info("[Heart and Stamina Containers] Stamina Mod found. Registering Stamina items.");
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FOOD_AND_DRINK).register(entries -> {
             entries.add(STAMINA_CONTAINER);

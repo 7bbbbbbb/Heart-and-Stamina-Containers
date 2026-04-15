@@ -31,6 +31,5 @@
   "text.config.heart_and_stamina_config.option.maxStamina.tooltip": "El valor no afectará a los modificadores de resistencia de otras fuentes.",
   "text.config.heart_and_stamina_config.option.showStaminaValueHUD.tooltip": "Se utiliza cuando hay instalado un mod de resistencia compatible.",
   "text.config.heart_and_stamina_config.option.lootChance": "Probabilidad de botín en cofres",
-  "text.config.heart_and_stamina_config.option.luckIncreasesLoot": "La suerte aumenta el botín de los cofres",
-  "text.config.heart_and_stamina_config.option.mobsDropContainers": "Lista de criaturas que sueltan contenedores"
+  "text.config.heart_and_stamina_config.option.luckIncreasesLoot": "La suerte aumenta el botín de los cofres"
 }

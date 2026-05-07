@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cross",
+  "textures": {
+    "cross": "heart_and_stamina:block/stamina_crystal"
+  }
+}

@@ -18,6 +18,9 @@
 		"main": [
           "net.x7bbbbbbb.heart_and_stamina.HeartAndStamina"
 		],
+        "fabric-datagen": [
+          "net.x7bbbbbbb.heart_and_stamina.HeartAndStaminaDataGenerator"
+        ],
         "client": [
           "net.x7bbbbbbb.heart_and_stamina.HeartAndStaminaClient"
         ]
@@ -28,9 +31,12 @@
 		"minecraft": "~1.21.1",
 		"java": ">=21",
 		"fabric-api": "*",
-        "owo": "0.12.15.4+1.21"
+        "owo": "*"
 	},
     "suggests": {
-      "staminafortweakers": "*"
+      "staminafortweakers": "*",
+      "aerialhell": "*",
+      "deeperdarker": "*",
+      "enderscape": "*"
     }
 }

@@ -1,15 +1,18 @@
 {
+  "block.heart_and_stamina.health_crystal_block": "Health Crystal",
+  "block.heart_and_stamina.stamina_crystal_block": "Stamina Crystal",
   "item.heart_and_stamina.heart_container": "Heart Container",
   "item.heart_and_stamina.heart_container_shard": "Heart Container Shard",
   "item.heart_and_stamina.stamina_container": "Stamina Container",
   "item.heart_and_stamina.stamina_container_shard": "Stamina Container Shard",
   "message.heart_and_stamina.health_limit reached": "Applied Heart Container limit reached!",
   "message.heart_and_stamina.stamina_limit reached": "Applied Stamina Container limit reached!",
-  "tooltip.heart_and_stamina.shift_down": "Press [Shift] for more info.",
-  "tooltip.heart_and_stamina.heart_container.1": "Consume it to gain extra health.",
-  "tooltip.heart_and_stamina.heart_container.2": "You'll lose some health obtained with containers when you die.",
-  "tooltip.heart_and_stamina.stamina_container.1": "Consume it to gain extra stamina.",
-  "tooltip.heart_and_stamina.stamina_container.2": "You'll lose some stamina obtained with containers when you die.",
+  "tooltip.heart_and_stamina.shift_down": "§7Press [Shift] for more info.",
+  "tooltip.heart_and_stamina.no_stamina_mod": "§4No stamina mod detected. Item unusable.",
+  "tooltip.heart_and_stamina.heart_container.1": "§7§oConsume it to gain extra health.",
+  "tooltip.heart_and_stamina.heart_container.2": "§7§oYou'll lose some health obtained with containers when you die.",
+  "tooltip.heart_and_stamina.stamina_container.1": "§7§oConsume it to gain extra stamina.",
+  "tooltip.heart_and_stamina.stamina_container.2": "§7§oYou'll lose some stamina obtained with containers when you die.",
   "text.config.heart_and_stamina_config.title": "Heart and Stamina Containers Configuration",
   "text.config.heart_and_stamina_config.option.healthIncrement": "Health increment",
   "text.config.heart_and_stamina_config.option.deathHealthDecrement": "Health decrement by death",
@@ -31,5 +34,7 @@
   "text.config.heart_and_stamina_config.option.maxStamina.tooltip": "Value won't affect stamina modifiers from other sources.",
   "text.config.heart_and_stamina_config.option.showStaminaValueHUD.tooltip": "Used when a supported Stamina mod is installed.",
   "text.config.heart_and_stamina_config.option.lootChance": "Chest loot chance",
-  "text.config.heart_and_stamina_config.option.luckIncreasesLoot": "Luck increases chest loot"
+  "text.config.heart_and_stamina_config.option.luckIncreasesLoot": "Luck increases chest loot",
+  "text.config.heart_and_stamina_config.option.mobsDropContainers": "List of mobs that drop containers",
+  "text.config.heart_and_stamina_config.option.generateCrystals": "Crystal Worldgen features"
 }

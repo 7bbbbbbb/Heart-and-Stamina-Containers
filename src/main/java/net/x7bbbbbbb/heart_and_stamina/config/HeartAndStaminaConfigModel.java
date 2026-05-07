@@ -53,6 +53,9 @@ public class HeartAndStaminaConfigModel{
             "minecraft:warden",
             "minecraft:elder_guardian"
     );
+    @Sync(Option.SyncMode.OVERRIDE_CLIENT)
+    @RestartRequired
+    public boolean generateCrystals = true;
 
     public static class HUDConfig {
         public int xOffset = 92;

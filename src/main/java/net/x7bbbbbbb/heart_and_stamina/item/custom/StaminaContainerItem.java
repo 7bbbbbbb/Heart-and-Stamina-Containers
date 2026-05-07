@@ -26,50 +26,58 @@ public class StaminaContainerItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         final var stack = user.getStackInHand(hand);
-        if (world.isClient)
+        if (HeartAndStamina.AVAILABLE_MAX_STAMINA_ID == null) {
             return TypedActionResult.fail(stack);
+        } else {
+            if (world.isClient)
+                return TypedActionResult.fail(stack);
 
-        // Increase stamina by adding an attribute modifier
-        final var attr = Registries.ATTRIBUTE.getEntry(HeartAndStamina.AVAILABLE_MAX_STAMINA_ID).map(user::getAttributeInstance).orElse(null);
+            // Increase stamina by adding an attribute modifier
+            final var attr = Registries.ATTRIBUTE.getEntry(HeartAndStamina.AVAILABLE_MAX_STAMINA_ID).map(user::getAttributeInstance).orElse(null);
 
-        // Get max stamina
-        boolean hasModifier = attr.hasModifier(HeartAndStamina.STAMINA_MODIFIER_ID);
-        int maxStamina = hasModifier ? (int) attr.getModifier(HeartAndStamina.STAMINA_MODIFIER_ID).value() + 100 : HeartAndStamina.CONFIG.baseStamina();
+            // Get max stamina
+            boolean hasModifier = attr.hasModifier(HeartAndStamina.STAMINA_MODIFIER_ID);
+            int maxStamina = hasModifier ? (int) attr.getModifier(HeartAndStamina.STAMINA_MODIFIER_ID).value() + 100 : HeartAndStamina.CONFIG.baseStamina();
 
-        // Check if at max allowable stamina
-        if (maxStamina >= HeartAndStamina.CONFIG.maxStamina()) {
-            user.sendMessage(Text.translatable("message.heart_and_stamina.stamina_limit reached").formatted(Formatting.RED), true);
-            return TypedActionResult.fail(stack);
+            // Check if at max allowable stamina
+            if (maxStamina >= HeartAndStamina.CONFIG.maxStamina()) {
+                user.sendMessage(Text.translatable("message.heart_and_stamina.stamina_limit reached").formatted(Formatting.RED), true);
+                return TypedActionResult.fail(stack);
+            }
+
+            // Play sound
+            user.playSoundToPlayer(SoundEvents.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
+
+            // Decrement stack
+            stack.decrement(1);
+
+            // Increment max stamina
+            int increment = Math.min(HeartAndStamina.CONFIG.staminaIncrement(), HeartAndStamina.CONFIG.maxStamina() - maxStamina);
+            maxStamina += increment;
+            // Calculate modifier value
+            int modifierValue = maxStamina - 100;
+
+            // Apply new modifier value
+            EntityAttributeModifier modifier = new EntityAttributeModifier(HeartAndStamina.STAMINA_MODIFIER_ID, modifierValue, EntityAttributeModifier.Operation.ADD_VALUE);
+            attr.overwritePersistentModifier(modifier);
+
+            return TypedActionResult.success(stack);
         }
-
-        // Play sound
-        user.playSoundToPlayer(SoundEvents.BLOCK_AMETHYST_BLOCK_BREAK, SoundCategory.PLAYERS, 1.0f, 1.0f);
-
-        // Decrement stack
-        stack.decrement(1);
-
-        // Increment max stamina
-        int increment = Math.min(HeartAndStamina.CONFIG.staminaIncrement(), HeartAndStamina.CONFIG.maxStamina() - maxStamina);
-        maxStamina += increment;
-        // Calculate modifier value
-        int modifierValue = maxStamina - 100;
-
-        // Apply new modifier value
-        EntityAttributeModifier modifier = new EntityAttributeModifier(HeartAndStamina.STAMINA_MODIFIER_ID, modifierValue, EntityAttributeModifier.Operation.ADD_VALUE);
-        attr.overwritePersistentModifier(modifier);
-
-        return TypedActionResult.success(stack);
     }
 
     @Override
     public void appendTooltip(ItemStack stack, TooltipContext context, List<Text> tooltip, TooltipType type) {
-        if (Screen.hasShiftDown()) {
-            tooltip.add(Text.translatable("tooltip.heart_and_stamina.stamina_container.1"));
-            if (HeartAndStamina.CONFIG.deathStaminaDecrement() > 0) {
-                tooltip.add(Text.translatable("tooltip.heart_and_stamina.stamina_container.2"));
+        if (HeartAndStamina.AVAILABLE_MAX_STAMINA_ID != null) {
+            if (Screen.hasShiftDown()) {
+                tooltip.add(Text.translatable("tooltip.heart_and_stamina.stamina_container.1"));
+                if (HeartAndStamina.CONFIG.deathStaminaDecrement() > 0) {
+                    tooltip.add(Text.translatable("tooltip.heart_and_stamina.stamina_container.2"));
+                }
+            } else {
+                tooltip.add(Text.translatable("tooltip.heart_and_stamina.shift_down"));
             }
         } else {
-            tooltip.add(Text.translatable("tooltip.heart_and_stamina.shift_down"));
+            tooltip.add(Text.translatable("tooltip.heart_and_stamina.no_stamina_mod"));
         }
         super.appendTooltip(stack, context, tooltip, type);
     }

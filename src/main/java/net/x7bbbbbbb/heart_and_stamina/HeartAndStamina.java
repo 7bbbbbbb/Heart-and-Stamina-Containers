@@ -10,13 +10,14 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.Identifier;
+import net.x7bbbbbbb.heart_and_stamina.block.HeartAndStaminaBlocks;
 import net.x7bbbbbbb.heart_and_stamina.config.HeartAndStaminaConfig;
 import net.x7bbbbbbb.heart_and_stamina.item.HeartItems;
 import net.x7bbbbbbb.heart_and_stamina.item.StaminaItems;
 import net.x7bbbbbbb.heart_and_stamina.util.LootTableModifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.*;
+import net.x7bbbbbbb.heart_and_stamina.world.gen.ModWorldGeneration;
 
 public class HeartAndStamina implements ModInitializer {
     public static final String MOD_ID = "heart_and_stamina";
@@ -27,27 +28,39 @@ public class HeartAndStamina implements ModInitializer {
     public static final Identifier STAMINA_MODIFIER_ID = Identifier.of(MOD_ID, "stamina");
 
     public static Identifier AVAILABLE_MAX_STAMINA_ID = null;
+    public static Boolean AERIALHELL_AVAILABLE = false;
+    public static Boolean DEEPERDARKER_AVAILABLE = false;
+    public static Boolean ENDERSCAPE_AVAILABLE = false;
+    public static Boolean TERRALITH_AVAILABLE = false;
 
     @Override
     public void onInitialize() {
-        HeartItems.registerModItems();
         if (FabricLoader.getInstance().isModLoaded("staminafortweakers")) {
-            StaminaItems.registerModItems();
             AVAILABLE_MAX_STAMINA_ID = Identifier.of("staminafortweakers", "generic.max_stamina");
         }
-
-        // Adding items to loot tables
+        if (FabricLoader.getInstance().isModLoaded("aerialhell")) {
+            AERIALHELL_AVAILABLE = true;
+        }
+        if (FabricLoader.getInstance().isModLoaded("deeperdarker")) {
+            DEEPERDARKER_AVAILABLE = true;
+        }
+        if (FabricLoader.getInstance().isModLoaded("enderscape")) {
+            ENDERSCAPE_AVAILABLE = true;
+        }
+        if (FabricLoader.getInstance().isModLoaded("terralith")) {
+            TERRALITH_AVAILABLE = true;
+        }
+        HeartItems.registerModItems();
+        StaminaItems.registerModItems();
+        HeartAndStaminaBlocks.registerBlocks();
         LootTableModifier.modifyLootTables();
-
-        // Called when new entity is loaded
+        if (CONFIG.generateCrystals()) {
+            ModWorldGeneration.generateModWorldGen();
+        }
         ServerEntityEvents.ENTITY_LOAD.register((entity, world) -> {
-            // Only handle player entities
             if (!(entity instanceof PlayerEntity player))
                 return;
-
             var attr1 = player.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
-
-            // Set player to base health if new player (has no modifier)
             assert attr1 != null;
             if (!attr1.hasModifier(HEALTH_MODIFIER_ID)) {
                 final var health = CONFIG.baseHealth();
@@ -70,34 +83,23 @@ public class HeartAndStamina implements ModInitializer {
             }
         });
 
-        // Called when player respawns
         ServerPlayerEvents.COPY_FROM.register((oldPlayer, newPlayer, arg2) -> {
             var oldAttr1 = oldPlayer.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH);
 
-            // Set new player modifier
             assert oldAttr1 != null;
             if (oldAttr1.hasModifier(HEALTH_MODIFIER_ID)) {
                 final var oldModifier1 = oldAttr1.getModifier(HEALTH_MODIFIER_ID);
-
-                // Lower the modifier value
                 assert oldModifier1 != null;
                 double newValue = oldModifier1.value() - CONFIG.deathHealthDecrement();
-
-                // Safety check
                 if (newValue < CONFIG.baseHealth() - 20) {
                     newValue = CONFIG.baseHealth() - 20;
                 }
-
                 int maxHealth = (int) newValue + 20;
-
-                // Create a new modifier with the reduced value
                 EntityAttributeModifier newModifier = new EntityAttributeModifier(
                         HEALTH_MODIFIER_ID,
                         newValue,
                         EntityAttributeModifier.Operation.ADD_VALUE
                 );
-
-                // Apply the newly created modifier
                 newPlayer.getAttributeInstance(EntityAttributes.GENERIC_MAX_HEALTH).addPersistentModifier(newModifier);
                 newPlayer.setHealth(maxHealth);
             }
@@ -106,24 +108,16 @@ public class HeartAndStamina implements ModInitializer {
                 assert oldAttr2 != null;
                 if (oldAttr2.hasModifier(STAMINA_MODIFIER_ID)) {
                     final var oldModifier2 = oldAttr2.getModifier(STAMINA_MODIFIER_ID);
-
-                    // Lower the modifier value
                     assert oldModifier2 != null;
                     double newValue = oldModifier2.value() - CONFIG.deathStaminaDecrement();
-
-                    // Safety check
                     if (newValue < CONFIG.baseStamina() - 100) {
                         newValue = CONFIG.baseStamina() - 100;
                     }
-
-                    // Create a new modifier with the reduced value
                     EntityAttributeModifier newModifier = new EntityAttributeModifier(
                             STAMINA_MODIFIER_ID,
                             newValue,
                             EntityAttributeModifier.Operation.ADD_VALUE
                     );
-
-                    // Apply the newly created modifier
                     Registries.ATTRIBUTE.getEntry(AVAILABLE_MAX_STAMINA_ID).map(newPlayer::getAttributeInstance).orElse(null).addPersistentModifier(newModifier);
                 }
             }

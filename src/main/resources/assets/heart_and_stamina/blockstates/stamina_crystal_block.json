@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "heart_and_stamina:block/stamina_crystal_block"
+    }
+  }
+}

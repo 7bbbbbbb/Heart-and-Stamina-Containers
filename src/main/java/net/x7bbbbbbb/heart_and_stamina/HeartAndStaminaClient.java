@@ -1,16 +1,22 @@
 package net.x7bbbbbbb.heart_and_stamina;
 
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.entity.attribute.EntityAttribute;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
+import net.x7bbbbbbb.heart_and_stamina.block.HeartAndStaminaBlocks;
 
 public class HeartAndStaminaClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
+        BlockRenderLayerMap.INSTANCE.putBlock(HeartAndStaminaBlocks.HEALTH_CRYSTAL_BLOCK, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(HeartAndStaminaBlocks.STAMINA_CRYSTAL_BLOCK, RenderLayer.getCutout());
+
         if (HeartAndStamina.AVAILABLE_MAX_STAMINA_ID != null) {
             EntityAttribute attr = Registries.ATTRIBUTE.get(HeartAndStamina.AVAILABLE_MAX_STAMINA_ID);
             String hex = HeartAndStamina.CONFIG.nestedHUDConfig.textColor().replace("#", "");
